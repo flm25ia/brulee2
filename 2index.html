@@ -1,0 +1,2235 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Centro de Mando Brûlée — Admin</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/cormorant-garamond@5.0.12/index.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.16/index.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --crema:#FAF4EA;
+  --papel:#FFFBF5;
+  --terracota:#B97A6B;
+  --terracota-dark:#9a5e4f;
+  --rosa:#D9A79A;
+  --dorado:#C6A15B;
+  --dorado-light:#e0c98a;
+  --chocolate:#2E2A26;
+  --chocolate-light:#5a524a;
+  --eucalipto:#7C8B6F;
+  --eucalipto-light:#9fb092;
+  --danger:#c0392b;
+  --warning:#f39c12;
+  --info:#3498db;
+  --shadow:0 2px 12px rgba(46,42,38,.08);
+  --shadow-lg:0 8px 32px rgba(46,42,38,.12);
+  --radius:10px;
+  --radius-lg:16px;
+  --sidebar-w:260px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:'Inter',sans-serif;
+  background:#f5f0e8;
+  color:var(--chocolate);
+  line-height:1.5;
+}
+h1,h2,h3,h4{font-family:'Cormorant Garamond',serif;font-weight:600}
+img{max-width:100%;display:block}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+
+/* LAYOUT */
+.app{display:flex;min-height:100vh}
+
+/* SIDEBAR */
+.sidebar{
+  width:var(--sidebar-w);
+  background:var(--chocolate);
+  color:var(--papel);
+  position:fixed;left:0;top:0;bottom:0;
+  display:flex;flex-direction:column;
+  z-index:100;
+}
+.sidebar-header{
+  padding:24px;
+  border-bottom:1px solid rgba(255,251,245,.1);
+}
+.sidebar-logo{
+  display:flex;align-items:center;gap:10px;
+  font-family:'Cormorant Garamond',serif;
+  font-size:22px;font-weight:700;
+}
+.sidebar-logo-icon{
+  width:36px;height:36px;
+  background:var(--terracota);
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;
+}
+.sidebar-logo span{color:var(--terracota)}
+.sidebar-nav{flex:1;padding:16px 0;overflow-y:auto}
+.nav-section{margin-bottom:20px}
+.nav-label{
+  padding:0 24px;
+  font-size:11px;font-weight:600;
+  color:rgba(255,251,245,.5);
+  text-transform:uppercase;letter-spacing:.1em;
+  margin-bottom:8px;
+}
+.nav-item{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 24px;
+  color:rgba(255,251,245,.8);
+  font-size:14px;font-weight:500;
+  transition:all .2s;
+  cursor:pointer;
+  border-left:3px solid transparent;
+}
+.nav-item:hover{
+  background:rgba(255,251,245,.05);
+  color:white;
+}
+.nav-item.active{
+  background:rgba(185,122,107,.15);
+  color:white;
+  border-left-color:var(--terracota);
+}
+.nav-icon{font-size:18px;width:20px;text-align:center}
+.nav-badge{
+  margin-left:auto;
+  background:var(--terracota);
+  color:white;
+  padding:2px 8px;border-radius:999px;
+  font-size:11px;font-weight:700;
+}
+.sidebar-footer{
+  padding:16px 24px;
+  border-top:1px solid rgba(255,251,245,.1);
+}
+.user-info{
+  display:flex;align-items:center;gap:10px;
+}
+.user-avatar{
+  width:36px;height:36px;
+  border-radius:50%;
+  background:var(--dorado);
+  display:flex;align-items:center;justify-content:center;
+  font-weight:700;font-size:14px;
+}
+.user-details{flex:1}
+.user-name{font-size:13px;font-weight:600}
+.user-role{font-size:11px;color:rgba(255,251,245,.6)}
+
+/* MAIN */
+.main{
+  flex:1;
+  margin-left:var(--sidebar-w);
+  display:flex;flex-direction:column;
+}
+.topbar{
+  background:var(--papel);
+  padding:16px 32px;
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid rgba(198,161,91,.15);
+  position:sticky;top:0;z-index:50;
+}
+.topbar-left{display:flex;align-items:center;gap:16px}
+.search-box{
+  display:flex;align-items:center;gap:8px;
+  background:var(--crema);
+  padding:10px 16px;border-radius:999px;
+  min-width:320px;
+}
+.search-box input{
+  border:none;background:none;outline:none;
+  font-family:inherit;font-size:14px;
+  flex:1;
+}
+.topbar-right{display:flex;align-items:center;gap:16px}
+.topbar-btn{
+  width:40px;height:40px;
+  border-radius:50%;
+  background:var(--crema);
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;
+  position:relative;
+}
+.notif-dot{
+  position:absolute;top:8px;right:8px;
+  width:8px;height:8px;
+  background:var(--terracota);
+  border-radius:50%;
+}
+
+/* CONTENT */
+.content{padding:32px;flex:1}
+.page-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:32px;
+}
+.page-title{font-size:32px;margin-bottom:4px}
+.page-subtitle{color:var(--chocolate-light);font-size:14px}
+
+/* CARDS */
+.card{
+  background:var(--papel);
+  border-radius:var(--radius-lg);
+  padding:24px;
+  box-shadow:var(--shadow);
+  margin-bottom:24px;
+}
+.card-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:20px;
+}
+.card-title{font-size:20px}
+
+/* KPI GRID */
+.kpi-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:20px;
+  margin-bottom:32px;
+}
+.kpi-card{
+  background:var(--papel);
+  border-radius:var(--radius-lg);
+  padding:24px;
+  box-shadow:var(--shadow);
+  position:relative;
+  overflow:hidden;
+}
+.kpi-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;
+  height:4px;
+}
+.kpi-card.ventas::before{background:var(--terracota)}
+.kpi-card.ocupacion::before{background:var(--dorado)}
+.kpi-card.mrr::before{background:var(--eucalipto)}
+.kpi-card.alumnos::before{background:var(--info)}
+.kpi-label{
+  font-size:12px;font-weight:600;
+  color:var(--chocolate-light);
+  text-transform:uppercase;letter-spacing:.05em;
+  margin-bottom:8px;
+}
+.kpi-value{
+  font-family:'Cormorant Garamond',serif;
+  font-size:36px;font-weight:700;
+  margin-bottom:4px;
+}
+.kpi-card.ventas .kpi-value{color:var(--terracota)}
+.kpi-card.ocupacion .kpi-value{color:var(--dorado)}
+.kpi-card.mrr .kpi-value{color:var(--eucalipto)}
+.kpi-card.alumnos .kpi-value{color:var(--info)}
+.kpi-change{
+  font-size:12px;font-weight:600;
+  display:flex;align-items:center;gap:4px;
+}
+.kpi-change.up{color:var(--eucalipto)}
+.kpi-change.down{color:var(--danger)}
+
+/* CHARTS */
+.charts-grid{
+  display:grid;
+  grid-template-columns:2fr 1fr;
+  gap:24px;
+  margin-bottom:24px;
+}
+.chart-container{
+  position:relative;
+  height:300px;
+}
+
+/* TABLES */
+.table-wrapper{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+th{
+  text-align:left;
+  padding:12px 16px;
+  font-size:12px;font-weight:600;
+  color:var(--chocolate-light);
+  text-transform:uppercase;letter-spacing:.05em;
+  border-bottom:2px solid rgba(198,161,91,.15);
+}
+td{
+  padding:14px 16px;
+  font-size:14px;
+  border-bottom:1px solid rgba(198,161,91,.1);
+}
+tr:hover td{background:var(--crema)}
+.status-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:4px 12px;border-radius:999px;
+  font-size:12px;font-weight:600;
+}
+.status-badge.success{background:rgba(124,139,111,.15);color:var(--eucalipto)}
+.status-badge.warning{background:rgba(243,156,18,.15);color:var(--warning)}
+.status-badge.danger{background:rgba(192,57,43,.15);color:var(--danger)}
+.status-badge.info{background:rgba(52,152,219,.15);color:var(--info)}
+
+/* BUTTONS */
+.btn{
+  padding:10px 20px;border-radius:8px;
+  font-size:14px;font-weight:600;
+  transition:all .2s;
+  display:inline-flex;align-items:center;gap:8px;
+}
+.btn-primary{
+  background:var(--terracota);color:white;
+}
+.btn-primary:hover{background:var(--terracota-dark)}
+.btn-secondary{
+  background:var(--crema);color:var(--chocolate);
+}
+.btn-secondary:hover{background:var(--dorado-light)}
+.btn-sm{padding:6px 12px;font-size:12px}
+.btn-icon{
+  width:32px;height:32px;
+  border-radius:6px;
+  display:inline-flex;align-items:center;justify-content:center;
+  font-size:16px;
+}
+.btn-icon:hover{background:var(--crema)}
+
+/* FORMS */
+.form-group{margin-bottom:16px}
+.form-label{
+  display:block;
+  font-size:13px;font-weight:600;
+  margin-bottom:6px;
+}
+.form-input,.form-select,.form-textarea{
+  width:100%;
+  padding:10px 14px;
+  border:1.5px solid rgba(198,161,91,.2);
+  border-radius:8px;
+  font-family:inherit;font-size:14px;
+  background:var(--papel);
+  transition:border-color .2s;
+}
+.form-input:focus,.form-select:focus,.form-textarea:focus{
+  outline:none;
+  border-color:var(--terracota);
+}
+.form-row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+}
+
+/* TABS */
+.tabs{
+  display:flex;gap:4px;
+  border-bottom:2px solid rgba(198,161,91,.15);
+  margin-bottom:24px;
+}
+.tab{
+  padding:12px 20px;
+  font-size:14px;font-weight:600;
+  color:var(--chocolate-light);
+  cursor:pointer;
+  border-bottom:2px solid transparent;
+  margin-bottom:-2px;
+  transition:all .2s;
+}
+.tab:hover{color:var(--chocolate)}
+.tab.active{
+  color:var(--terracota);
+  border-bottom-color:var(--terracota);
+}
+
+/* MODAL */
+.modal-overlay{
+  position:fixed;inset:0;
+  background:rgba(46,42,38,.6);
+  display:flex;align-items:center;justify-content:center;
+  z-index:200;
+  opacity:0;pointer-events:none;
+  transition:opacity .3s;
+}
+.modal-overlay.active{opacity:1;pointer-events:all}
+.modal{
+  background:var(--papel);
+  border-radius:var(--radius-lg);
+  padding:32px;
+  max-width:600px;width:90%;
+  max-height:90vh;overflow-y:auto;
+  transform:scale(.95);
+  transition:transform .3s;
+}
+.modal-overlay.active .modal{transform:scale(1)}
+.modal-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:24px;
+}
+.modal-title{font-size:24px}
+.modal-close{
+  width:32px;height:32px;
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;
+}
+.modal-close:hover{background:var(--crema)}
+
+/* GRID UTILS */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+
+/* CALENDAR */
+.calendar{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:8px;
+}
+.calendar-header{
+  text-align:center;
+  font-size:12px;font-weight:600;
+  color:var(--chocolate-light);
+  padding:8px;
+}
+.calendar-day{
+  aspect-ratio:1;
+  background:var(--crema);
+  border-radius:8px;
+  padding:8px;
+  font-size:12px;
+  cursor:pointer;
+  position:relative;
+  transition:all .2s;
+}
+.calendar-day:hover{background:var(--dorado-light)}
+.calendar-day.has-event{background:rgba(185,122,107,.15)}
+.calendar-day.has-event::after{
+  content:'';position:absolute;bottom:4px;left:50%;transform:translateX(-50%);
+  width:6px;height:6px;
+  background:var(--terracota);
+  border-radius:50%;
+}
+.calendar-day.today{
+  background:var(--terracota);
+  color:white;
+  font-weight:700;
+}
+
+/* UPLOAD ZONE */
+.upload-zone{
+  border:2px dashed rgba(198,161,91,.3);
+  border-radius:var(--radius-lg);
+  padding:48px;
+  text-align:center;
+  cursor:pointer;
+  transition:all .2s;
+}
+.upload-zone:hover{
+  border-color:var(--terracota);
+  background:rgba(185,122,107,.05);
+}
+.upload-icon{font-size:48px;margin-bottom:12px;color:var(--dorado)}
+.upload-text{font-size:14px;color:var(--chocolate-light)}
+
+/* BADGE */
+.badge{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:4px 10px;border-radius:6px;
+  font-size:11px;font-weight:600;
+}
+.badge-gold{background:rgba(198,161,91,.15);color:var(--dorado)}
+.badge-terracota{background:rgba(185,122,107,.15);color:var(--terracota)}
+
+/* PROGRESS */
+.progress-bar{
+  height:8px;
+  background:var(--crema);
+  border-radius:999px;
+  overflow:hidden;
+  margin-top:8px;
+}
+.progress-fill{
+  height:100%;
+  background:var(--terracota);
+  border-radius:999px;
+  transition:width .3s;
+}
+
+/* HIDDEN SECTIONS */
+.section{display:none}
+.section.active{display:block}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <div class="sidebar-logo-icon">👨‍🍳</div>
+        <div>Brûlée <span>Admin</span></div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-label">Principal</div>
+        <div class="nav-item active" data-section="dashboard">
+          <span class="nav-icon">📊</span>Dashboard
+        </div>
+        <div class="nav-item" data-section="cursos">
+          <span class="nav-icon">🎓</span>Cursos
+          <span class="nav-badge">12</span>
+        </div>
+        <div class="nav-item" data-section="reservas">
+          <span class="nav-icon">📅</span>Reservas
+          <span class="nav-badge">8</span>
+        </div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-label">Alumnos</div>
+        <div class="nav-item" data-section="crm">
+          <span class="nav-icon">👥</span>CRM Alumnos
+        </div>
+        <div class="nav-item" data-section="constancias">
+          <span class="nav-icon">🏆</span>Constancias
+        </div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-label">Contenido</div>
+        <div class="nav-item" data-section="replay">
+          <span class="nav-icon">📹</span>Gestor REPLAY
+        </div>
+        <div class="nav-item" data-section="blog">
+          <span class="nav-icon">✍️</span>Blog
+        </div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-label">Comercial</div>
+        <div class="nav-item" data-section="tienda">
+          <span class="nav-icon">🛒</span>Tienda & Kits
+        </div>
+        <div class="nav-item" data-section="cupones">
+          <span class="nav-icon">🎟️</span>Cupones
+        </div>
+        <div class="nav-item" data-section="alianzas">
+          <span class="nav-icon">🤝</span>Alianzas
+        </div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-label">Operación</div>
+        <div class="nav-item" data-section="calendario">
+          <span class="nav-icon">🗓️</span>Calendario
+        </div>
+        <div class="nav-item" data-section="inventario">
+          <span class="nav-icon">📦</span>Inventario
+        </div>
+        <div class="nav-item" data-section="finanzas">
+          <span class="nav-icon">💰</span>Finanzas
+        </div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-label">Sistema</div>
+        <div class="nav-item" data-section="reportes">
+          <span class="nav-icon">📈</span>Reportes
+        </div>
+        <div class="nav-item" data-section="config">
+          <span class="nav-icon">⚙️</span>Configuración
+        </div>
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar">LM</div>
+        <div class="user-details">
+          <div class="user-name">Laura Méndez</div>
+          <div class="user-role">Directora</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <div class="search-box">
+          <span>🔍</span>
+          <input type="text" placeholder="Buscar cursos, alumnos, reservas...">
+        </div>
+      </div>
+      <div class="topbar-right">
+        <button class="topbar-btn">
+          🔔
+          <span class="notif-dot"></span>
+        </button>
+        <button class="topbar-btn">💬</button>
+        <button class="btn btn-primary btn-sm">+ Nueva clase</button>
+      </div>
+    </div>
+
+    <div class="content">
+      <!-- DASHBOARD -->
+      <div class="section active" id="dashboard">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Dashboard</h1>
+            <p class="page-subtitle">Miércoles, 18 de noviembre 2026</p>
+          </div>
+          <button class="btn btn-secondary">📥 Exportar reporte</button>
+        </div>
+
+        <div class="kpi-grid">
+          <div class="kpi-card ventas">
+            <div class="kpi-label">Ventas del día</div>
+            <div class="kpi-value">$18,450</div>
+            <div class="kpi-change up">↑ 23% vs ayer</div>
+          </div>
+          <div class="kpi-card ocupacion">
+            <div class="kpi-label">Ocupación promedio</div>
+            <div class="kpi-value">78%</div>
+            <div class="kpi-change up">↑ 12% esta semana</div>
+          </div>
+          <div class="kpi-card mrr">
+            <div class="kpi-label">MRR Suscripciones</div>
+            <div class="kpi-value">$47,800</div>
+            <div class="kpi-change up">↑ 8 nuevos este mes</div>
+          </div>
+          <div class="kpi-card alumnos">
+            <div class="kpi-label">Alumnos activos</div>
+            <div class="kpi-value">284</div>
+            <div class="kpi-change up">↑ 15 este mes</div>
+          </div>
+        </div>
+
+        <div class="charts-grid">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Ingresos últimos 30 días</h3>
+              <select class="form-select" style="width:auto">
+                <option>Últimos 30 días</option>
+                <option>Últimos 7 días</option>
+                <option>Este mes</option>
+              </select>
+            </div>
+            <div class="chart-container">
+              <canvas id="revenueChart"></canvas>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Distribución de ingresos</h3>
+            </div>
+            <div class="chart-container">
+              <canvas id="distributionChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Próximas clases</h3>
+              <button class="btn btn-secondary btn-sm">Ver todas</button>
+            </div>
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Curso</th>
+                    <th>Fecha</th>
+                    <th>Lugares</th>
+                    <th>Estado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Cupcakes de Fresa</strong><br><small>Presencial · Iniciación</small></td>
+                    <td>Sáb 22 Nov<br>9:00 AM</td>
+                    <td>4/12</td>
+                    <td><span class="status-badge warning">Por llenar</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Pan de Masa Madre</strong><br><small>Presencial · Intermedio</small></td>
+                    <td>Dom 23 Nov<br>10:00 AM</td>
+                    <td>7/10</td>
+                    <td><span class="status-badge success">Disponible</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Pizza Napolitana</strong><br><small>Presencial · Avanzado</small></td>
+                    <td>Sáb 29 Nov<br>6:00 PM</td>
+                    <td>2/8</td>
+                    <td><span class="status-badge danger">Últimos lugares</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Mini Chefs: Cookies</strong><br><small>Kids 4-9 años</small></td>
+                    <td>Dom 30 Nov<br>11:00 AM</td>
+                    <td>5/8</td>
+                    <td><span class="status-badge success">Disponible</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Actividad reciente</h3>
+            </div>
+            <div style="space-y:16px">
+              <div style="display:flex;gap:12px;padding:12px 0;border-bottom:1px solid rgba(198,161,91,.1)">
+                <div style="width:40px;height:40px;border-radius:50%;background:var(--eucalipto);display:flex;align-items:center;justify-content:center;font-size:18px">🎓</div>
+                <div style="flex:1">
+                  <div style="font-size:14px;font-weight:600">Ana Ramírez se graduó</div>
+                  <div style="font-size:12px;color:var(--chocolate-light)">Repostería I · Hace 2 horas</div>
+                </div>
+              </div>
+              <div style="display:flex;gap:12px;padding:12px 0;border-bottom:1px solid rgba(198,161,91,.1)">
+                <div style="width:40px;height:40px;border-radius:50%;background:var(--terracota);display:flex;align-items:center;justify-content:center;font-size:18px">💳</div>
+                <div style="flex:1">
+                  <div style="font-size:14px;font-weight:600">Nueva reserva: $1,849</div>
+                  <div style="font-size:12px;color:var(--chocolate-light)">Carlos Mendoza · Pizza Napolitana · Hace 3 horas</div>
+                </div>
+              </div>
+              <div style="display:flex;gap:12px;padding:12px 0;border-bottom:1px solid rgba(198,161,91,.1)">
+                <div style="width:40px;height:40px;border-radius:50%;background:var(--dorado);display:flex;align-items:center;justify-content:center;font-size:18px">📹</div>
+                <div style="flex:1">
+                  <div style="font-size:14px;font-weight:600">Video REPLAY subido</div>
+                  <div style="font-size:12px;color:var(--chocolate-light)">Cupcakes de Fresa · 12 alumnos notificados · Hace 5 horas</div>
+                </div>
+              </div>
+              <div style="display:flex;gap:12px;padding:12px 0">
+                <div style="width:40px;height:40px;border-radius:50%;background:var(--info);display:flex;align-items:center;justify-content:center;font-size:18px">🎟️</div>
+                <div style="flex:1">
+                  <div style="font-size:14px;font-weight:600">Cupón usado: BRULEE10</div>
+                  <div style="font-size:12px;color:var(--chocolate-light)">María López · $85 descuento · Hace 6 horas</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CURSOS -->
+      <div class="section" id="cursos">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Cursos</h1>
+            <p class="page-subtitle">Gestiona tu catálogo de cursos</p>
+          </div>
+          <button class="btn btn-primary" onclick="openModal('newCourseModal')">+ Nuevo curso</button>
+        </div>
+
+        <div class="tabs">
+          <div class="tab active">Todos (12)</div>
+          <div class="tab">Presenciales (8)</div>
+          <div class="tab">Online (3)</div>
+          <div class="tab">Kids & Teens (1)</div>
+        </div>
+
+        <div class="card">
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Curso</th>
+                  <th>Modalidad</th>
+                  <th>Nivel</th>
+                  <th>Precio</th>
+                  <th>REPLAY</th>
+                  <th>Ocupación</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <strong>Cupcakes de Fresa & Buttercream</strong><br>
+                    <small style="color:var(--chocolate-light)">Sábados · 3 horas</small>
+                  </td>
+                  <td><span class="badge badge-terracota">Presencial</span></td>
+                  <td>Iniciación</td>
+                  <td><strong>$850</strong></td>
+                  <td><span class="badge badge-gold">+$399</span></td>
+                  <td>
+                    <div style="font-size:13px;margin-bottom:4px">4/12 (33%)</div>
+                    <div class="progress-bar"><div class="progress-fill" style="width:33%"></div></div>
+                  </td>
+                  <td>
+                    <button class="btn-icon">✏️</button>
+                    <button class="btn-icon">📊</button>
+                    <button class="btn-icon">🗑️</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Pan de Masa Madre Artesanal</strong><br>
+                    <small style="color:var(--chocolate-light)">Domingos · 4 horas</small>
+                  </td>
+                  <td><span class="badge badge-terracota">Presencial</span></td>
+                  <td>Intermedio</td>
+                  <td><strong>$1,200</strong></td>
+                  <td><span class="badge badge-gold">+$399</span></td>
+                  <td>
+                    <div style="font-size:13px;margin-bottom:4px">7/10 (70%)</div>
+                    <div class="progress-bar"><div class="progress-fill" style="width:70%"></div></div>
+                  </td>
+                  <td>
+                    <button class="btn-icon">✏️</button>
+                    <button class="btn-icon">📊</button>
+                    <button class="btn-icon">🗑️</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Pizza Napolitana & Fermentados</strong><br>
+                    <small style="color:var(--chocolate-light)">Sábados · 3.5 horas</small>
+                  </td>
+                  <td><span class="badge badge-terracota">Presencial</span></td>
+                  <td>Avanzado</td>
+                  <td><strong>$1,450</strong></td>
+                  <td><span class="badge badge-gold">+$399</span></td>
+                  <td>
+                    <div style="font-size:13px;margin-bottom:4px">2/8 (25%)</div>
+                    <div class="progress-bar"><div class="progress-fill" style="width:25%"></div></div>
+                  </td>
+                  <td>
+                    <button class="btn-icon">✏️</button>
+                    <button class="btn-icon">📊</button>
+                    <button class="btn-icon">🗑️</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Fondant & Decoración</strong><br>
+                    <small style="color:var(--chocolate-light)">Online · 6 módulos</small>
+                  </td>
+                  <td><span class="badge badge-gold">Online</span></td>
+                  <td>Intermedio</td>
+                  <td><strong>$499</strong></td>
+                  <td><span class="badge badge-gold">Incluido</span></td>
+                  <td>
+                    <div style="font-size:13px;margin-bottom:4px">45 inscritos</div>
+                    <div class="progress-bar"><div class="progress-fill" style="width:90%;background:var(--eucalipto)"></div></div>
+                  </td>
+                  <td>
+                    <button class="btn-icon">✏️</button>
+                    <button class="btn-icon">📊</button>
+                    <button class="btn-icon">🗑️</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Mini Chefs: Cookies Locas</strong><br>
+                    <small style="color:var(--chocolate-light)">Domingos · 2 horas · 4-9 años</small>
+                  </td>
+                  <td><span class="badge badge-terracota">Presencial</span></td>
+                  <td>Kids</td>
+                  <td><strong>$650</strong></td>
+                  <td><span class="badge badge-gold">+$299</span></td>
+                  <td>
+                    <div style="font-size:13px;margin-bottom:4px">5/8 (62%)</div>
+                    <div class="progress-bar"><div class="progress-fill" style="width:62%"></div></div>
+                  </td>
+                  <td>
+                    <button class="btn-icon">✏️</button>
+                    <button class="btn-icon">📊</button>
+                    <button class="btn-icon">🗑️</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Diplomado Repostería Profesional</strong><br>
+                    <small style="color:var(--chocolate-light)">Híbrido · 3 meses</small>
+                  </td>
+                  <td><span class="badge badge-gold">Híbrido</span></td>
+                  <td>Profesional</td>
+                  <td><strong>$14,900</strong></td>
+                  <td><span class="badge badge-gold">Incluido</span></td>
+                  <td>
+                    <div style="font-size:13px;margin-bottom:4px">3/15 (20%)</div>
+                    <div class="progress-bar"><div class="progress-fill" style="width:20%"></div></div>
+                  </td>
+                  <td>
+                    <button class="btn-icon">✏️</button>
+                    <button class="btn-icon">📊</button>
+                    <button class="btn-icon">🗑️</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- RESERVAS -->
+      <div class="section" id="reservas">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Reservas</h1>
+            <p class="page-subtitle">Gestiona las inscripciones a tus cursos</p>
+          </div>
+          <div style="display:flex;gap:12px">
+            <button class="btn btn-secondary">📥 Exportar</button>
+            <button class="btn btn-primary">+ Nueva reserva</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Reservas recientes</h3>
+            <div style="display:flex;gap:12px">
+              <select class="form-select" style="width:auto">
+                <option>Todos los estados</option>
+                <option>Confirmadas</option>
+                <option>Pendiente de pago</option>
+                <option>Canceladas</option>
+              </select>
+              <input type="date" class="form-input" style="width:auto">
+            </div>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Folio</th>
+                  <th>Alumno</th>
+                  <th>Curso</th>
+                  <th>Fecha</th>
+                  <th>Monto</th>
+                  <th>Pago</th>
+                  <th>Estado</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>#B-2026-0142</strong></td>
+                  <td>Ana María Ramírez</td>
+                  <td>Cupcakes de Fresa</td>
+                  <td>Sáb 22 Nov</td>
+                  <td>$1,249</td>
+                  <td><span class="status-badge success">✓ Tarjeta</span></td>
+                  <td><span class="status-badge success">Confirmada</span></td>
+                  <td>
+                    <button class="btn-icon">👁️</button>
+                    <button class="btn-icon">✏️</button>
+                    <button class="btn-icon">📧</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>#B-2026-0141</strong></td>
+                  <td>Carlos Mendoza</td>
+                  <td>Pizza Napolitana</td>
+                  <td>Sáb 29 Nov</td>
+                  <td>$1,849</td>
+                  <td><span class="status-badge warning">⏳ OXXO</span></td>
+                  <td><span class="status-badge warning">Pendiente</span></td>
+                  <td>
+                    <button class="btn-icon">👁️</button>
+                    <button class="btn-icon">✏️</button>
+                    <button class="btn-icon">📧</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>#B-2026-0140</strong></td>
+                  <td>María López</td>
+                  <td>Pan de Masa Madre</td>
+                  <td>Dom 23 Nov</td>
+                  <td>$1,200</td>
+                  <td><span class="status-badge success">✓ SPEI</span></td>
+                  <td><span class="status-badge success">Confirmada</span></td>
+                  <td>
+                    <button class="btn-icon">👁️</button>
+                    <button class="btn-icon">✏️</button>
+                    <button class="btn-icon">📧</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>#B-2026-0139</strong></td>
+                  <td>Roberto Sánchez</td>
+                  <td>Diplomado Repostería</td>
+                  <td>Feb 2027</td>
+                  <td>$14,900</td>
+                  <td><span class="status-badge success">✓ Tarjeta</span></td>
+                  <td><span class="status-badge success">Confirmada</span></td>
+                  <td>
+                    <button class="btn-icon">👁️</button>
+                    <button class="btn-icon">✏️</button>
+                    <button class="btn-icon">📧</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- CRM -->
+      <div class="section" id="crm">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">CRM de Alumnos</h1>
+            <p class="page-subtitle">Gestiona tu base de alumnos y comunicación</p>
+          </div>
+          <button class="btn btn-primary">+ Nuevo alumno</button>
+        </div>
+
+        <div class="grid-3" style="margin-bottom:24px">
+          <div class="card">
+            <div class="kpi-label">Total alumnos</div>
+            <div class="kpi-value" style="color:var(--info);font-size:28px">284</div>
+          </div>
+          <div class="card">
+            <div class="kpi-label">Activos este mes</div>
+            <div class="kpi-value" style="color:var(--eucalipto);font-size:28px">156</div>
+          </div>
+          <div class="card">
+            <div class="kpi-label">Graduados</div>
+            <div class="kpi-value" style="color:var(--dorado);font-size:28px">89</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Lista de alumnos</h3>
+            <div style="display:flex;gap:12px">
+              <input type="text" class="form-input" placeholder="Buscar por nombre o email" style="width:240px">
+              <select class="form-select" style="width:auto">
+                <option>Todos los tags</option>
+                <option>VIP</option>
+                <option>Recurrente</option>
+                <option>Nuevo</option>
+                <option>Kids</option>
+              </select>
+            </div>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Alumno</th>
+                  <th>Contacto</th>
+                  <th>Cursos tomados</th>
+                  <th>Gasto total</th>
+                  <th>Tags</th>
+                  <th>Última actividad</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <div style="display:flex;align-items:center;gap:10px">
+                      <div style="width:36px;height:36px;border-radius:50%;background:var(--terracota);color:white;display:flex;align-items:center;justify-content:center;font-weight:700">AR</div>
+                      <div>
+                        <div style="font-weight:600">Ana María Ramírez</div>
+                        <div style="font-size:12px;color:var(--chocolate-light)">ana.ramirez@email.com</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div>921 123 4567</div>
+                    <div style="font-size:12px;color:var(--chocolate-light)">WhatsApp ✓</div>
+                  </td>
+                  <td>4 cursos</td>
+                  <td><strong>$4,850</strong></td>
+                  <td>
+                    <span class="badge badge-terracota">VIP</span>
+                    <span class="badge badge-gold">Recurrente</span>
+                  </td>
+                  <td>Hoy</td>
+                  <td>
+                    <button class="btn-icon">👁️</button>
+                    <button class="btn-icon">💬</button>
+                    <button class="btn-icon">📧</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div style="display:flex;align-items:center;gap:10px">
+                      <div style="width:36px;height:36px;border-radius:50%;background:var(--dorado);color:white;display:flex;align-items:center;justify-content:center;font-weight:700">CM</div>
+                      <div>
+                        <div style="font-weight:600">Carlos Mendoza</div>
+                        <div style="font-size:12px;color:var(--chocolate-light)">carlos.m@email.com</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div>921 234 5678</div>
+                    <div style="font-size:12px;color:var(--chocolate-light)">WhatsApp ✓</div>
+                  </td>
+                  <td>2 cursos</td>
+                  <td><strong>$2,699</strong></td>
+                  <td>
+                    <span class="badge badge-gold">Nuevo</span>
+                  </td>
+                  <td>Ayer</td>
+                  <td>
+                    <button class="btn-icon">👁️</button>
+                    <button class="btn-icon">💬</button>
+                    <button class="btn-icon">📧</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div style="display:flex;align-items:center;gap:10px">
+                      <div style="width:36px;height:36px;border-radius:50%;background:var(--eucalipto);color:white;display:flex;align-items:center;justify-content:center;font-weight:700">ML</div>
+                      <div>
+                        <div style="font-weight:600">María López</div>
+                        <div style="font-size:12px;color:var(--chocolate-light)">maria.lopez@email.com</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div>921 345 6789</div>
+                    <div style="font-size:12px;color:var(--chocolate-light)">WhatsApp ✓</div>
+                  </td>
+                  <td>6 cursos</td>
+                  <td><strong>$7,200</strong></td>
+                  <td>
+                    <span class="badge badge-terracota">VIP</span>
+                    <span class="badge badge-gold">Recurrente</span>
+                  </td>
+                  <td>Hace 2 días</td>
+                  <td>
+                    <button class="btn-icon">👁️</button>
+                    <button class="btn-icon">💬</button>
+                    <button class="btn-icon">📧</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONSTANCIAS -->
+      <div class="section" id="constancias">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Emisor de Constancias</h1>
+            <p class="page-subtitle">Genera y valida constancias digitales</p>
+          </div>
+          <button class="btn btn-primary">+ Emitir constancia</button>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Plantilla de constancia</h3>
+              <button class="btn btn-secondary btn-sm">Editar plantilla</button>
+            </div>
+            <div style="background:var(--crema);padding:32px;border-radius:var(--radius-lg);text-align:center;border:2px solid var(--dorado)">
+              <div style="font-size:48px;margin-bottom:16px">🏆</div>
+              <div style="font-family:'Cormorant Garamond',serif;font-size:28px;color:var(--terracota);margin-bottom:8px">CONSTANCIA DE ACREDITACIÓN</div>
+              <div style="font-size:14px;color:var(--chocolate-light);margin-bottom:24px">Instituto Culinario Brûlée</div>
+              <div style="font-size:18px;margin-bottom:16px">Se otorga la presente a:</div>
+              <div style="font-family:'Cormorant Garamond',serif;font-size:32px;color:var(--chocolate);margin-bottom:16px">Ana María Ramírez López</div>
+              <div style="font-size:14px;color:var(--chocolate-light);margin-bottom:24px">Por haber completado satisfactoriamente el curso:</div>
+              <div style="font-size:20px;font-weight:600;margin-bottom:24px">Repostería I: Fundamentos</div>
+              <div style="display:flex;justify-content:space-around;font-size:12px;color:var(--chocolate-light)">
+                <div>
+                  <div style="font-weight:700;color:var(--chocolate)">Folio</div>
+                  <div>B-2026-0142</div>
+                </div>
+                <div>
+                  <div style="font-weight:700;color:var(--chocolate)">Fecha</div>
+                  <div>18 Nov 2026</div>
+                </div>
+                <div>
+                  <div style="font-weight:700;color:var(--chocolate)">Chef</div>
+                  <div>Laura Méndez</div>
+                </div>
+              </div>
+              <div style="margin-top:24px;padding-top:16px;border-top:1px solid var(--dorado)">
+                <div style="font-size:10px;color:var(--chocolate-light)">Verifica esta constancia en: brulee.mx/verificar</div>
+                <div style="font-size:10px;color:var(--chocolate-light);margin-top:4px">Hash: 8f3a...c21</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Constancias emitidas</h3>
+            </div>
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Folio</th>
+                    <th>Alumno</th>
+                    <th>Curso</th>
+                    <th>Fecha</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>B-2026-0142</strong></td>
+                    <td>Ana Ramírez</td>
+                    <td>Repostería I</td>
+                    <td>18 Nov 2026</td>
+                    <td>
+                      <button class="btn-icon">📥</button>
+                      <button class="btn-icon">🔗</button>
+                      <button class="btn-icon">📧</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><strong>B-2026-0141</strong></td>
+                    <td>Carlos Mendoza</td>
+                    <td>Panadería Básica</td>
+                    <td>15 Nov 2026</td>
+                    <td>
+                      <button class="btn-icon">📥</button>
+                      <button class="btn-icon">🔗</button>
+                      <button class="btn-icon">📧</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><strong>B-2026-0140</strong></td>
+                    <td>María López</td>
+                    <td>Cupcakes Avanzado</td>
+                    <td>10 Nov 2026</td>
+                    <td>
+                      <button class="btn-icon">📥</button>
+                      <button class="btn-icon">🔗</button>
+                      <button class="btn-icon">📧</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- REPLAY -->
+      <div class="section" id="replay">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Gestor de Contenido REPLAY</h1>
+            <p class="page-subtitle">Sube videos de clases y gestiona accesos vitalicios</p>
+          </div>
+          <button class="btn btn-primary">+ Subir video</button>
+        </div>
+
+        <div class="card">
+          <div class="upload-zone">
+            <div class="upload-icon">📹</div>
+            <div style="font-size:18px;font-weight:600;margin-bottom:8px">Arrastra tu video aquí</div>
+            <div class="upload-text">o haz clic para seleccionar · MP4, MOV hasta 2GB</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Videos subidos</h3>
+            <div style="display:flex;gap:12px">
+              <select class="form-select" style="width:auto">
+                <option>Todos los cursos</option>
+                <option>Cupcakes de Fresa</option>
+                <option>Pan de Masa Madre</option>
+              </select>
+            </div>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Video</th>
+                  <th>Curso</th>
+                  <th>Duración</th>
+                  <th>Alumnos con acceso</th>
+                  <th>Vistas</th>
+                  <th>Estado</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <div style="display:flex;align-items:center;gap:12px">
+                      <div style="width:80px;height:60px;background:var(--chocolate);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:24px">▶️</div>
+                      <div>
+                        <div style="font-weight:600">Cupcakes de Fresa - Sesión completa</div>
+                        <div style="font-size:12px;color:var(--chocolate-light)">Subido hace 2 días</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>Cupcakes de Fresa</td>
+                  <td>2h 15min</td>
+                  <td>12 alumnos</td>
+                  <td>47 vistas</td>
+                  <td><span class="status-badge success">✓ Publicado</span></td>
+                  <td>
+                    <button class="btn-icon">✏️</button>
+                    <button class="btn-icon">📊</button>
+                    <button class="btn-icon">🗑️</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div style="display:flex;align-items:center;gap:12px">
+                      <div style="width:80px;height:60px;background:var(--chocolate);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:24px">▶️</div>
+                      <div>
+                        <div style="font-weight:600">Pan de Masa Madre - Fermentación</div>
+                        <div style="font-size:12px;color:var(--chocolate-light)">Subido hace 5 días</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>Pan de Masa Madre</td>
+                  <td>1h 45min</td>
+                  <td>8 alumnos</td>
+                  <td>23 vistas</td>
+                  <td><span class="status-badge success">✓ Publicado</span></td>
+                  <td>
+                    <button class="btn-icon">✏️</button>
+                    <button class="btn-icon">📊</button>
+                    <button class="btn-icon">🗑️</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div style="display:flex;align-items:center;gap:12px">
+                      <div style="width:80px;height:60px;background:var(--chocolate);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:24px">⏳</div>
+                      <div>
+                        <div style="font-weight:600">Pizza Napolitana - Masa y horneado</div>
+                        <div style="font-size:12px;color:var(--chocolate-light)">Procesando...</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>Pizza Napolitana</td>
+                  <td>2h 30min</td>
+                  <td>—</td>
+                  <td>—</td>
+                  <td><span class="status-badge warning">⏳ Procesando</span></td>
+                  <td>
+                    <button class="btn-icon">✏️</button>
+                    <button class="btn-icon">🗑️</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- CALENDARIO -->
+      <div class="section" id="calendario">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Calendario de Aulas y Chefs</h1>
+            <p class="page-subtitle">Gestiona la disponibilidad de espacios e instructores</p>
+          </div>
+          <button class="btn btn-primary">+ Nueva clase</button>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Noviembre 2026</h3>
+              <div style="display:flex;gap:8px">
+                <button class="btn-icon">◀</button>
+                <button class="btn-icon">▶</button>
+              </div>
+            </div>
+            <div class="calendar">
+              <div class="calendar-header">Dom</div>
+              <div class="calendar-header">Lun</div>
+              <div class="calendar-header">Mar</div>
+              <div class="calendar-header">Mié</div>
+              <div class="calendar-header">Jue</div>
+              <div class="calendar-header">Vie</div>
+              <div class="calendar-header">Sáb</div>
+              
+              <div class="calendar-day" style="opacity:.3">29</div>
+              <div class="calendar-day" style="opacity:.3">30</div>
+              <div class="calendar-day" style="opacity:.3">31</div>
+              <div class="calendar-day">1</div>
+              <div class="calendar-day">2</div>
+              <div class="calendar-day">3</div>
+              <div class="calendar-day has-event">4</div>
+              <div class="calendar-day">5</div>
+              <div class="calendar-day">6</div>
+              <div class="calendar-day">7</div>
+              <div class="calendar-day">8</div>
+              <div class="calendar-day">9</div>
+              <div class="calendar-day">10</div>
+              <div class="calendar-day">11</div>
+              <div class="calendar-day">12</div>
+              <div class="calendar-day">13</div>
+              <div class="calendar-day has-event">14</div>
+              <div class="calendar-day">15</div>
+              <div class="calendar-day">16</div>
+              <div class="calendar-day">17</div>
+              <div class="calendar-day today">18</div>
+              <div class="calendar-day">19</div>
+              <div class="calendar-day">20</div>
+              <div class="calendar-day">21</div>
+              <div class="calendar-day has-event">22</div>
+              <div class="calendar-day has-event">23</div>
+              <div class="calendar-day">24</div>
+              <div class="calendar-day">25</div>
+              <div class="calendar-day">26</div>
+              <div class="calendar-day">27</div>
+              <div class="calendar-day">28</div>
+              <div class="calendar-day has-event">29</div>
+              <div class="calendar-day has-event">30</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Próximas clases agendadas</h3>
+            </div>
+            <div style="space-y:16px">
+              <div style="padding:16px;background:var(--crema);border-radius:var(--radius);margin-bottom:12px;border-left:4px solid var(--terracota)">
+                <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+                  <div style="font-weight:600">Cupcakes de Fresa</div>
+                  <div style="font-size:12px;color:var(--chocolate-light)">Sáb 22 Nov · 9:00 AM</div>
+                </div>
+                <div style="font-size:13px;color:var(--chocolate-light);margin-bottom:8px">👨‍🍳 Chef Laura Méndez · Aula 1</div>
+                <div style="font-size:12px">4/12 lugares · <span style="color:var(--terracota);font-weight:600">Por llenar</span></div>
+              </div>
+              <div style="padding:16px;background:var(--crema);border-radius:var(--radius);margin-bottom:12px;border-left:4px solid var(--dorado)">
+                <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+                  <div style="font-weight:600">Pan de Masa Madre</div>
+                  <div style="font-size:12px;color:var(--chocolate-light)">Dom 23 Nov · 10:00 AM</div>
+                </div>
+                <div style="font-size:13px;color:var(--chocolate-light);margin-bottom:8px">👨‍🍳 Chef Roberto Sánchez · Aula 2</div>
+                <div style="font-size:12px">7/10 lugares · <span style="color:var(--eucalipto);font-weight:600">Disponible</span></div>
+              </div>
+              <div style="padding:16px;background:var(--crema);border-radius:var(--radius);border-left:4px solid var(--danger)">
+                <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+                  <div style="font-weight:600">Pizza Napolitana</div>
+                  <div style="font-size:12px;color:var(--chocolate-light)">Sáb 29 Nov · 6:00 PM</div>
+                </div>
+                <div style="font-size:13px;color:var(--chocolate-light);margin-bottom:8px">👨‍🍳 Chef Carlos Mendoza · Aula 1</div>
+                <div style="font-size:12px">2/8 lugares · <span style="color:var(--danger);font-weight:600">Últimos lugares</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- INVENTARIO -->
+      <div class="section" id="inventario">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Inventario de Insumos y Kits</h1>
+            <p class="page-subtitle">Controla tu stock de ingredientes y productos</p>
+          </div>
+          <button class="btn btn-primary">+ Agregar producto</button>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Stock actual</h3>
+            <div style="display:flex;gap:12px">
+              <select class="form-select" style="width:auto">
+                <option>Todas las categorías</option>
+                <option>Harinas</option>
+                <option>Chocolates</option>
+                <option>Frutas</option>
+                <option>Kits</option>
+              </select>
+            </div>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Producto</th>
+                  <th>Categoría</th>
+                  <th>Stock</th>
+                  <th>Mínimo</th>
+                  <th>Estado</th>
+                  <th>Última reposición</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Harina de trigo 00</strong></td>
+                  <td>Harinas</td>
+                  <td>45 kg</td>
+                  <td>20 kg</td>
+                  <td><span class="status-badge success">✓ OK</span></td>
+                  <td>15 Nov 2026</td>
+                  <td>
+                    <button class="btn-icon">✏️</button>
+                    <button class="btn-icon">📦</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>Chocolate belga 70%</strong></td>
+                  <td>Chocolates</td>
+                  <td>8 kg</td>
+                  <td>10 kg</td>
+                  <td><span class="status-badge warning">⚠ Bajo</span></td>
+                  <td>10 Nov 2026</td>
+                  <td>
+                    <button class="btn-icon">✏️</button>
+                    <button class="btn-icon">📦</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>Fresas frescas</strong></td>
+                  <td>Frutas</td>
+                  <td>3 kg</td>
+                  <td>5 kg</td>
+                  <td><span class="status-badge danger">🚨 Crítico</span></td>
+                  <td>17 Nov 2026</td>
+                  <td>
+                    <button class="btn-icon">✏️</button>
+                    <button class="btn-icon">📦</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>Kit Cupcakes (12 pax)</strong></td>
+                  <td>Kits</td>
+                  <td>15 kits</td>
+                  <td>5 kits</td>
+                  <td><span class="status-badge success">✓ OK</span></td>
+                  <td>12 Nov 2026</td>
+                  <td>
+                    <button class="btn-icon">✏️</button>
+                    <button class="btn-icon">📦</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- FINANZAS -->
+      <div class="section" id="finanzas">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Finanzas</h1>
+            <p class="page-subtitle">Conciliación, facturación CFDI 4.0 y reportes financieros</p>
+          </div>
+          <button class="btn btn-primary">+ Nueva factura</button>
+        </div>
+
+        <div class="kpi-grid">
+          <div class="kpi-card ventas">
+            <div class="kpi-label">Ingresos del mes</div>
+            <div class="kpi-value">$127,450</div>
+            <div class="kpi-change up">↑ 18% vs mes anterior</div>
+          </div>
+          <div class="kpi-card mrr">
+            <div class="kpi-label">Por cobrar</div>
+            <div class="kpi-value">$8,200</div>
+            <div class="kpi-change down">3 pagos pendientes</div>
+          </div>
+          <div class="kpi-card alumnos">
+            <div class="kpi-label">Facturas emitidas</div>
+            <div class="kpi-value">47</div>
+            <div class="kpi-change up">Este mes</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Transacciones recientes</h3>
+            <div style="display:flex;gap:12px">
+              <select class="form-select" style="width:auto">
+                <option>Todos los métodos</option>
+                <option>Tarjeta</option>
+                <option>SPEI</option>
+                <option>OXXO</option>
+              </select>
+            </div>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Folio</th>
+                  <th>Concepto</th>
+                  <th>Cliente</th>
+                  <th>Método</th>
+                  <th>Monto</th>
+                  <th>CFDI</th>
+                  <th>Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>#F-2026-0089</strong></td>
+                  <td>Curso Cupcakes + REPLAY</td>
+                  <td>Ana Ramírez</td>
+                  <td>Tarjeta</td>
+                  <td><strong>$1,249</strong></td>
+                  <td><span class="status-badge success">✓ Emitida</span></td>
+                  <td><span class="status-badge success">Completada</span></td>
+                </tr>
+                <tr>
+                  <td><strong>#F-2026-0088</strong></td>
+                  <td>Curso Pizza Napolitana</td>
+                  <td>Carlos Mendoza</td>
+                  <td>OXXO</td>
+                  <td><strong>$1,450</strong></td>
+                  <td><span class="status-badge warning">⏳ Pendiente</span></td>
+                  <td><span class="status-badge warning">Por pagar</span></td>
+                </tr>
+                <tr>
+                  <td><strong>#F-2026-0087</strong></td>
+                  <td>Diplomado Repostería</td>
+                  <td>Roberto Sánchez</td>
+                  <td>Tarjeta</td>
+                  <td><strong>$14,900</strong></td>
+                  <td><span class="status-badge success">✓ Emitida</span></td>
+                  <td><span class="status-badge success">Completada</span></td>
+                </tr>
+                <tr>
+                  <td><strong>#F-2026-0086</strong></td>
+                  <td>Club Brûlée (mensual)</td>
+                  <td>María López</td>
+                  <td>SPEI</td>
+                  <td><strong>$199</strong></td>
+                  <td><span class="status-badge success">✓ Emitida</span></td>
+                  <td><span class="status-badge success">Completada</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- CUPONES -->
+      <div class="section" id="cupones">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Cupones y Promociones</h1>
+            <p class="page-subtitle">Gestiona descuentos y códigos promocionales</p>
+          </div>
+          <button class="btn btn-primary">+ Nuevo cupón</button>
+        </div>
+
+        <div class="card">
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Código</th>
+                  <th>Descuento</th>
+                  <th>Tipo</th>
+                  <th>Usos</th>
+                  <th>Válido hasta</th>
+                  <th>Estado</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>BRULEE10</strong></td>
+                  <td>10%</td>
+                  <td>Porcentaje</td>
+                  <td>23/100</td>
+                  <td>31 Dic 2026</td>
+                  <td><span class="status-badge success">✓ Activo</span></td>
+                  <td>
+                    <button class="btn-icon">✏️</button>
+                    <button class="btn-icon">📊</button>
+                    <button class="btn-icon">🗑️</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>BIENVENIDO</strong></td>
+                  <td>$100</td>
+                  <td>Fijo</td>
+                  <td>45/∞</td>
+                  <td>Sin límite</td>
+                  <td><span class="status-badge success">✓ Activo</span></td>
+                  <td>
+                    <button class="btn-icon">✏️</button>
+                    <button class="btn-icon">📊</button>
+                    <button class="btn-icon">🗑️</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>KIDS20</strong></td>
+                  <td>20%</td>
+                  <td>Porcentaje</td>
+                  <td>12/50</td>
+                  <td>30 Nov 2026</td>
+                  <td><span class="status-badge warning">⏳ Por expirar</span></td>
+                  <td>
+                    <button class="btn-icon">✏️</button>
+                    <button class="btn-icon">📊</button>
+                    <button class="btn-icon">🗑️</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>VERANO2026</strong></td>
+                  <td>15%</td>
+                  <td>Porcentaje</td>
+                  <td>89/100</td>
+                  <td>31 Ago 2026</td>
+                  <td><span class="status-badge danger">✗ Expirado</span></td>
+                  <td>
+                    <button class="btn-icon">✏️</button>
+                    <button class="btn-icon">📊</button>
+                    <button class="btn-icon">🗑️</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ALIANZAS -->
+      <div class="section" id="alianzas">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Alianzas Estratégicas</h1>
+            <p class="page-subtitle">Gestiona tus partnerships con universidades y empresas</p>
+          </div>
+          <button class="btn btn-primary">+ Nueva alianza</button>
+        </div>
+
+        <div class="grid-3">
+          <div class="card">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+              <div style="width:48px;height:48px;border-radius:var(--radius);background:var(--info);display:flex;align-items:center;justify-content:center;font-size:24px">🎓</div>
+              <div>
+                <div style="font-weight:700">Universidad Veracruzana</div>
+                <div style="font-size:12px;color:var(--chocolate-light)">Co-certificación</div>
+              </div>
+            </div>
+            <div style="font-size:13px;color:var(--chocolate-light);margin-bottom:12px">Programa de prácticas profesionales para estudiantes de Gastronomía</div>
+            <div style="display:flex;justify-content:space-between;font-size:12px">
+              <span><strong>12</strong> alumnos referidos</span>
+              <span class="status-badge success">✓ Activa</span>
+            </div>
+          </div>
+
+          <div class="card">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+              <div style="width:48px;height:48px;border-radius:var(--radius);background:var(--terracota);display:flex;align-items:center;justify-content:center;font-size:24px">🍽️</div>
+              <div>
+                <div style="font-weight:700">Restaurante La Parroquia</div>
+                <div style="font-size:12px;color:var(--chocolate-light)">Bolsa de trabajo</div>
+              </div>
+            </div>
+            <div style="font-size:13px;color:var(--chocolate-light);margin-bottom:12px">Contratación preferencial de egresados Brûlée</div>
+            <div style="display:flex;justify-content:space-between;font-size:12px">
+              <span><strong>5</strong> colocados</span>
+              <span class="status-badge success">✓ Activa</span>
+            </div>
+          </div>
+
+          <div class="card">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+              <div style="width:48px;height:48px;border-radius:var(--radius);background:var(--dorado);display:flex;align-items:center;justify-content:center;font-size:24px">🏢</div>
+              <div>
+                <div style="font-weight:700">Pemex Coatzacoalcos</div>
+                <div style="font-size:12px;color:var(--chocolate-light)">Team Building</div>
+              </div>
+            </div>
+            <div style="font-size:13px;color:var(--chocolate-light);margin-bottom:12px">Eventos corporativos trimestrales para empleados</div>
+            <div style="display:flex;justify-content:space-between;font-size:12px">
+              <span><strong>3</strong> eventos agendados</span>
+              <span class="status-badge success">✓ Activa</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- REPORTES -->
+      <div class="section" id="reportes">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Reportes</h1>
+            <p class="page-subtitle">Analiza el desempeño de tu escuela</p>
+          </div>
+          <button class="btn btn-primary">📥 Generar reporte</button>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Reportes disponibles</h3>
+            </div>
+            <div style="space-y:12px">
+              <div style="padding:16px;background:var(--crema);border-radius:var(--radius);margin-bottom:12px;cursor:pointer">
+                <div style="display:flex;align-items:center;gap:12px">
+                  <div style="font-size:24px">📊</div>
+                  <div style="flex:1">
+                    <div style="font-weight:600">Ventas y ocupación</div>
+                    <div style="font-size:12px;color:var(--chocolate-light)">Últimos 30 días</div>
+                  </div>
+                  <button class="btn btn-secondary btn-sm">Descargar</button>
+                </div>
+              </div>
+              <div style="padding:16px;background:var(--crema);border-radius:var(--radius);margin-bottom:12px;cursor:pointer">
+                <div style="display:flex;align-items:center;gap:12px">
+                  <div style="font-size:24px">👥</div>
+                  <div style="flex:1">
+                    <div style="font-weight:600">Base de alumnos</div>
+                    <div style="font-size:12px;color:var(--chocolate-light)">CRM completo</div>
+                  </div>
+                  <button class="btn btn-secondary btn-sm">Descargar</button>
+                </div>
+              </div>
+              <div style="padding:16px;background:var(--crema);border-radius:var(--radius);margin-bottom:12px;cursor:pointer">
+                <div style="display:flex;align-items:center;gap:12px">
+                  <div style="font-size:24px">💰</div>
+                  <div style="flex:1">
+                    <div style="font-weight:600">Financiero</div>
+                    <div style="font-size:12px;color:var(--chocolate-light)">Ingresos, CFDI, conciliación</div>
+                  </div>
+                  <button class="btn btn-secondary btn-sm">Descargar</button>
+                </div>
+              </div>
+              <div style="padding:16px;background:var(--crema);border-radius:var(--radius);cursor:pointer">
+                <div style="display:flex;align-items:center;gap:12px">
+                  <div style="font-size:24px">📹</div>
+                  <div style="flex:1">
+                    <div style="font-weight:600">REPLAY y contenido</div>
+                    <div style="font-size:12px;color:var(--chocolate-light)">Vistas, accesos, engagement</div>
+                  </div>
+                  <button class="btn btn-secondary btn-sm">Descargar</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Métricas clave</h3>
+            </div>
+            <div class="chart-container">
+              <canvas id="metricsChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BLOG -->
+      <div class="section" id="blog">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Blog</h1>
+            <p class="page-subtitle">Gestiona tu contenido editorial</p>
+          </div>
+          <button class="btn btn-primary">+ Nuevo artículo</button>
+        </div>
+
+        <div class="card">
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Título</th>
+                  <th>Categoría</th>
+                  <th>Autor</th>
+                  <th>Publicado</th>
+                  <th>Vistas</th>
+                  <th>Estado</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>5 errores al hacer merengue</strong></td>
+                  <td>Técnicas</td>
+                  <td>Chef Laura</td>
+                  <td>15 Nov 2026</td>
+                  <td>1,247</td>
+                  <td><span class="status-badge success">✓ Publicado</span></td>
+                  <td>
+                    <button class="btn-icon">✏️</button>
+                    <button class="btn-icon">📊</button>
+                    <button class="btn-icon">🗑️</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>Emprender una pastelería en el Golfo</strong></td>
+                  <td>Emprendimiento</td>
+                  <td>Chef Roberto</td>
+                  <td>10 Nov 2026</td>
+                  <td>892</td>
+                  <td><span class="status-badge success">✓ Publicado</span></td>
+                  <td>
+                    <button class="btn-icon">✏️</button>
+                    <button class="btn-icon">📊</button>
+                    <button class="btn-icon">🗑️</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>Cupcakes de fresa: la receta</strong></td>
+                  <td>Recetas</td>
+                  <td>Chef Laura</td>
+                  <td>5 Nov 2026</td>
+                  <td>2,134</td>
+                  <td><span class="status-badge success">✓ Publicado</span></td>
+                  <td>
+                    <button class="btn-icon">✏️</button>
+                    <button class="btn-icon">📊</button>
+                    <button class="btn-icon">🗑️</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>Kids en la cocina: beneficios</strong></td>
+                  <td>Kids & Teens</td>
+                  <td>Chef María</td>
+                  <td>—</td>
+                  <td>—</td>
+                  <td><span class="status-badge warning">📝 Borrador</span></td>
+                  <td>
+                    <button class="btn-icon">✏️</button>
+                    <button class="btn-icon">🗑️</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TIENDA -->
+      <div class="section" id="tienda">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Tienda & Kits</h1>
+            <p class="page-subtitle">Gestiona gift cards y kits de ingredientes</p>
+          </div>
+          <button class="btn btn-primary">+ Nuevo producto</button>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Productos</h3>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Producto</th>
+                  <th>Tipo</th>
+                  <th>Precio</th>
+                  <th>Vendidos</th>
+                  <th>Stock</th>
+                  <th>Estado</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Gift Card $500</strong></td>
+                  <td>Gift Card</td>
+                  <td>$500</td>
+                  <td>34</td>
+                  <td>∞</td>
+                  <td><span class="status-badge success">✓ Activo</span></td>
+                  <td>
+                    <button class="btn-icon">✏️</button>
+                    <button class="btn-icon">📊</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>Gift Card $1,000</strong></td>
+                  <td>Gift Card</td>
+                  <td>$1,000</td>
+                  <td>18</td>
+                  <td>∞</td>
+                  <td><span class="status-badge success">✓ Activo</span></td>
+                  <td>
+                    <button class="btn-icon">✏️</button>
+                    <button class="btn-icon">📊</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>Kit Cupcakes (12 pax)</strong></td>
+                  <td>Kit</td>
+                  <td>$850</td>
+                  <td>12</td>
+                  <td>15</td>
+                  <td><span class="status-badge success">✓ Activo</span></td>
+                  <td>
+                    <button class="btn-icon">✏️</button>
+                    <button class="btn-icon">📊</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>Kit Pan de Masa Madre</strong></td>
+                  <td>Kit</td>
+                  <td>$650</td>
+                  <td>8</td>
+                  <td>7</td>
+                  <td><span class="status-badge warning">⚠ Bajo stock</span></td>
+                  <td>
+                    <button class="btn-icon">✏️</button>
+                    <button class="btn-icon">📊</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONFIG -->
+      <div class="section" id="config">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Configuración</h1>
+            <p class="page-subtitle">Ajustes generales del sistema</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Información de la escuela</h3>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Nombre</label>
+              <input type="text" class="form-input" value="Instituto Culinario Brûlée">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Teléfono</label>
+              <input type="text" class="form-input" value="921 138 8616">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Dirección</label>
+            <input type="text" class="form-input" value="Zamora #511, Col. Centro, Coatzacoalcos, Ver.">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <input type="email" class="form-input" value="hola@brulee.mx">
+            </div>
+            <div class="form-group">
+              <label class="form-label">RFC</label>
+              <input type="text" class="form-input" value="ICB20150101ABC">
+            </div>
+          </div>
+          <button class="btn btn-primary">Guardar cambios</button>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Integraciones</h3>
+          </div>
+          <div style="space-y:16px">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:16px;background:var(--crema);border-radius:var(--radius);margin-bottom:12px">
+              <div>
+                <div style="font-weight:600">Mercado Pago</div>
+                <div style="font-size:12px;color:var(--chocolate-light)">Pasarela de pagos</div>
+              </div>
+              <span class="status-badge success">✓ Conectado</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:16px;background:var(--crema);border-radius:var(--radius);margin-bottom:12px">
+              <div>
+                <div style="font-weight:600">WhatsApp Business API</div>
+                <div style="font-size:12px;color:var(--chocolate-light)">Notificaciones automáticas</div>
+              </div>
+              <span class="status-badge success">✓ Conectado</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:16px;background:var(--crema);border-radius:var(--radius);margin-bottom:12px">
+              <div>
+                <div style="font-weight:600">CFDI 4.0</div>
+                <div style="font-size:12px;color:var(--chocolate-light)">Facturación electrónica</div>
+              </div>
+              <span class="status-badge success">✓ Conectado</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:16px;background:var(--crema);border-radius:var(--radius)">
+              <div>
+                <div style="font-weight:600">Google Analytics</div>
+                <div style="font-size:12px;color:var(--chocolate-light)">Tracking y métricas</div>
+              </div>
+              <button class="btn btn-secondary btn-sm">Conectar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- MODAL NUEVO CURSO -->
+<div class="modal-overlay" id="newCourseModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 class="modal-title">Nuevo curso</h2>
+      <button class="modal-close" onclick="closeModal('newCourseModal')">✕</button>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Nombre del curso</label>
+        <input type="text" class="form-input" placeholder="Ej: Cupcakes de Fresa">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Categoría</label>
+        <select class="form-select">
+          <option>Repostería</option>
+          <option>Panadería</option>
+          <option>Cocina</option>
+          <option>Kids & Teens</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Modalidad</label>
+        <select class="form-select">
+          <option>Presencial</option>
+          <option>Online grabado</option>
+          <option>En vivo</option>
+          <option>Híbrido</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Nivel</label>
+        <select class="form-select">
+          <option>Iniciación</option>
+          <option>Intermedio</option>
+          <option>Avanzado</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Precio</label>
+        <input type="number" class="form-input" placeholder="850">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Precio REPLAY</label>
+        <input type="number" class="form-input" placeholder="399">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Capacidad</label>
+        <input type="number" class="form-input" placeholder="12">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Duración (horas)</label>
+        <input type="number" class="form-input" placeholder="3">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Descripción</label>
+      <textarea class="form-textarea" rows="4" placeholder="Describe el curso..."></textarea>
+    </div>
+    <div style="display:flex;gap:12px;justify-content:flex-end">
+      <button class="btn btn-secondary" onclick="closeModal('newCourseModal')">Cancelar</button>
+      <button class="btn btn-primary">Crear curso</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Navigation
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.addEventListener('click', function() {
+    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+    this.classList.add('active');
+    
+    const section = this.dataset.section;
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.getElementById(section).classList.add('active');
+  });
+});
+
+// Modal functions
+function openModal(id) {
+  document.getElementById(id).classList.add('active');
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('active');
+}
+
+// Charts
+const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+new Chart(revenueCtx, {
+  type: 'line',
+  data: {
+    labels: ['1 Nov', '5 Nov', '10 Nov', '15 Nov', '18 Nov'],
+    datasets: [{
+      label: 'Ingresos',
+      data: [12000, 18500, 15200, 22400, 18450],
+      borderColor: '#B97A6B',
+      backgroundColor: 'rgba(185,122,107,.1)',
+      tension: .4,
+      fill: true
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false }
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        ticks: {
+          callback: v => '$' + v.toLocaleString()
+        }
+      }
+    }
+  }
+});
+
+const distributionCtx = document.getElementById('distributionChart').getContext('2d');
+new Chart(distributionCtx, {
+  type: 'doughnut',
+  data: {
+    labels: ['Cursos presenciales', 'REPLAY', 'Suscripciones', 'Kits', 'Gift Cards'],
+    datasets: [{
+      data: [45, 20, 18, 10, 7],
+      backgroundColor: ['#B97A6B', '#C6A15B', '#7C8B6F', '#D9A79A', '#3498db']
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'bottom',
+        labels: { padding: 12, font: { size: 11 } }
+      }
+    }
+  }
+});
+
+const metricsCtx = document.getElementById('metricsChart').getContext('2d');
+new Chart(metricsCtx, {
+  type: 'bar',
+  data: {
+    labels: ['Ocupación', 'REPLAY attach', 'NPS', 'Retención'],
+    datasets: [{
+      label: '%',
+      data: [78, 42, 87, 65],
+      backgroundColor: ['#B97A6B', '#C6A15B', '#7C8B6F', '#3498db']
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false }
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        max: 100,
+        ticks: {
+          callback: v => v + '%'
+        }
+      }
+    }
+  }
+});
+</script>
+</body>
+</html>
